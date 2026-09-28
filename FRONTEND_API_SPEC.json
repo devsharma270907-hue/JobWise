@@ -1,0 +1,472 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "JobWise API",
+    "description": "Comprehensive OpenAPI 3.0 Specification for the JobWise Career Operating System Backend.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5001/api/v1",
+      "description": "Local Development Server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string" },
+          "name": { "type": "string" },
+          "email": { "type": "string", "format": "email" },
+          "role": { "type": "string", "enum": ["student", "switcher", "freelancer"] },
+          "skills": { "type": "array", "items": { "type": "string" } },
+          "targetRoles": { "type": "array", "items": { "type": "string" } },
+          "targetLocations": { "type": "array", "items": { "type": "string" } },
+          "preferredComp": { "type": "string" }
+        }
+      },
+      "RegisterRequest": {
+        "type": "object",
+        "required": ["name", "email", "password"],
+        "properties": {
+          "name": { "type": "string", "minLength": 2, "maxLength": 100 },
+          "email": { "type": "string", "format": "email" },
+          "password": { "type": "string", "minLength": 8 },
+          "role": { "type": "string", "enum": ["student", "switcher", "freelancer"], "default": "student" }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": { "type": "string", "format": "email" },
+          "password": { "type": "string" }
+        }
+      },
+      "UpdateProfileRequest": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "targetRoles": { "type": "array", "items": { "type": "string" } },
+          "targetLocations": { "type": "array", "items": { "type": "string" } },
+          "skills": { "type": "array", "items": { "type": "string" } },
+          "preferredComp": { "type": "string" }
+        }
+      },
+      "DeleteAccountRequest": {
+        "type": "object",
+        "required": ["confirmationText"],
+        "properties": {
+          "confirmationText": { "type": "string", "enum": ["DELETE MY ACCOUNT"] }
+        }
+      },
+      "Job": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string" },
+          "title": { "type": "string" },
+          "company": { "type": "string" },
+          "location": { "type": "string" },
+          "jobType": { "type": "string" },
+          "salaryRange": { "type": "string" },
+          "description": { "type": "string" },
+          "requirements": { "type": "array", "items": { "type": "string" } },
+          "skills": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "CreateJobRequest": {
+        "type": "object",
+        "required": ["title", "company", "location", "description"],
+        "properties": {
+          "title": { "type": "string" },
+          "company": { "type": "string" },
+          "location": { "type": "string" },
+          "remote": { "type": "boolean" },
+          "jobType": { "type": "string", "enum": ["full-time", "internship", "contract", "part-time"] },
+          "salaryRange": { "type": "string" },
+          "description": { "type": "string" },
+          "requirements": { "type": "array", "items": { "type": "string" } },
+          "skills": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "TailorJobRequest": {
+        "type": "object",
+        "required": ["resumeVersionId"],
+        "properties": {
+          "resumeVersionId": { "type": "string" },
+          "tone": { "type": "string", "enum": ["concise", "detailed", "formal"], "default": "concise" }
+        }
+      },
+      "CreateApplicationRequest": {
+        "type": "object",
+        "required": ["jobId", "jobTitle", "company"],
+        "properties": {
+          "jobId": { "type": "string" },
+          "jobTitle": { "type": "string" },
+          "company": { "type": "string" },
+          "location": { "type": "string" },
+          "status": { "type": "string", "enum": ["applied", "interviewing", "offer", "rejected", "withdrawn"], "default": "applied" },
+          "tailoredBullets": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "UpdateApplicationStatusRequest": {
+        "type": "object",
+        "required": ["status"],
+        "properties": {
+          "status": { "type": "string", "enum": ["applied", "interviewing", "offer", "rejected", "withdrawn"] },
+          "note": { "type": "string" }
+        }
+      },
+      "AddNoteRequest": {
+        "type": "object",
+        "required": ["content"],
+        "properties": {
+          "content": { "type": "string" }
+        }
+      },
+      "GenerateInterviewPrepRequest": {
+        "type": "object",
+        "required": ["jobTitle", "company", "description"],
+        "properties": {
+          "jobTitle": { "type": "string" },
+          "company": { "type": "string" },
+          "description": { "type": "string" }
+        }
+      },
+      "EvaluateAnswerRequest": {
+        "type": "object",
+        "required": ["questionId", "answer"],
+        "properties": {
+          "questionId": { "type": "string" },
+          "answer": { "type": "string" }
+        }
+      },
+      "CreateFreelanceGigRequest": {
+        "type": "object",
+        "required": ["title", "client", "description"],
+        "properties": {
+          "title": { "type": "string" },
+          "client": { "type": "string" },
+          "platform": { "type": "string", "default": "Direct" },
+          "budget": { "type": "string" },
+          "description": { "type": "string" },
+          "skills": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "DraftPitchRequest": {
+        "type": "object",
+        "properties": {
+          "tone": { "type": "string", "enum": ["persuasive", "technical", "concise"], "default": "persuasive" }
+        }
+      },
+      "UpdateGigStatusRequest": {
+        "type": "object",
+        "required": ["status"],
+        "properties": {
+          "status": { "type": "string", "enum": ["open", "proposal_sent", "in_discussion", "won", "completed", "closed"] }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "summary": "Register a new user",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RegisterRequest" } } }
+        },
+        "responses": { "201": { "description": "User created and access token issued" } }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "Login user and issue tokens",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/LoginRequest" } } }
+        },
+        "responses": { "200": { "description": "Successful login" } }
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "summary": "Rotate access token via HttpOnly refresh cookie",
+        "responses": { "200": { "description": "New access token returned" } }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "summary": "Logout user and revoke refresh session",
+        "responses": { "200": { "description": "Logged out successfully" } }
+      }
+    },
+    "/users/me": {
+      "get": {
+        "summary": "Get authenticated user profile",
+        "security": [{ "bearerAuth": [] }],
+        "responses": { "200": { "description": "User profile returned" } }
+      },
+      "patch": {
+        "summary": "Update user profile",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdateProfileRequest" } } }
+        },
+        "responses": { "200": { "description": "Profile updated" } }
+      },
+      "delete": {
+        "summary": "Delete account with cascade soft deletion",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DeleteAccountRequest" } } }
+        },
+        "responses": { "200": { "description": "Account deleted" } }
+      }
+    },
+    "/users/me/export": {
+      "get": {
+        "summary": "Export GDPR full user archive",
+        "security": [{ "bearerAuth": [] }],
+        "responses": { "200": { "description": "Full JSON archive" } }
+      }
+    },
+    "/resumes/upload": {
+      "post": {
+        "summary": "Upload and parse PDF/DOCX resume",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": { "resume": { "type": "string", "format": "binary" } }
+              }
+            }
+          }
+        },
+        "responses": { "201": { "description": "Resume uploaded and parsed" } }
+      }
+    },
+    "/resumes": {
+      "get": {
+        "summary": "List user resumes",
+        "security": [{ "bearerAuth": [] }],
+        "responses": { "200": { "description": "Array of resumes" } }
+      }
+    },
+    "/resumes/{id}": {
+      "get": {
+        "summary": "Get resume by ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Resume details" } }
+      },
+      "delete": {
+        "summary": "Delete resume",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Resume deleted" } }
+      }
+    },
+    "/jobs": {
+      "get": {
+        "summary": "Query and rank jobs feed",
+        "parameters": [
+          { "name": "search", "in": "query", "schema": { "type": "string" } },
+          { "name": "role", "in": "query", "schema": { "type": "string" } },
+          { "name": "location", "in": "query", "schema": { "type": "string" } },
+          { "name": "remote", "in": "query", "schema": { "type": "boolean" } },
+          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 20 } }
+        ],
+        "responses": { "200": { "description": "Ranked job list" } }
+      },
+      "post": {
+        "summary": "Create job listing",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreateJobRequest" } } }
+        },
+        "responses": { "201": { "description": "Job created" } }
+      }
+    },
+    "/jobs/{id}": {
+      "get": {
+        "summary": "Get job by ID",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Job details" } }
+      }
+    },
+    "/jobs/{id}/tailor": {
+      "post": {
+        "summary": "Generate AI tailored resume bullets and cover letter",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TailorJobRequest" } } }
+        },
+        "responses": { "200": { "description": "Tailored bullets and cover letter draft" } }
+      }
+    },
+    "/applications": {
+      "get": {
+        "summary": "List tracked Kanban applications",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "status", "in": "query", "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Array of applications" } }
+      },
+      "post": {
+        "summary": "Create application tracking entry",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreateApplicationRequest" } } }
+        },
+        "responses": { "201": { "description": "Application tracked" } }
+      }
+    },
+    "/applications/{id}/status": {
+      "patch": {
+        "summary": "Update application stage in Kanban",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdateApplicationStatusRequest" } } }
+        },
+        "responses": { "200": { "description": "Status updated with timeline event" } }
+      }
+    },
+    "/applications/{id}/notes": {
+      "post": {
+        "summary": "Add interview note to application",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AddNoteRequest" } } }
+        },
+        "responses": { "200": { "description": "Note appended" } }
+      }
+    },
+    "/applications/{id}": {
+      "get": {
+        "summary": "Get application details by ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Single application with timeline and notes" } }
+      },
+      "delete": {
+        "summary": "Delete application card",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Application deleted" } }
+      }
+    },
+    "/skill-gaps": {
+      "get": {
+        "summary": "Compute skill gap analysis",
+        "security": [{ "bearerAuth": [] }],
+        "responses": { "200": { "description": "Skill gap breakdown" } }
+      }
+    },
+    "/interview-prep/generate": {
+      "post": {
+        "summary": "Generate AI mock interview questions",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/GenerateInterviewPrepRequest" } } }
+        },
+        "responses": { "201": { "description": "Interview session created" } }
+      }
+    },
+    "/interview-prep": {
+      "get": {
+        "summary": "List past mock interview sessions",
+        "security": [{ "bearerAuth": [] }],
+        "responses": { "200": { "description": "Array of prep sessions" } }
+      }
+    },
+    "/interview-prep/{id}": {
+      "get": {
+        "summary": "Get mock interview session by ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Single interview prep session details" } }
+      }
+    },
+    "/interview-prep/{id}/evaluate": {
+      "post": {
+        "summary": "Evaluate candidate answer with AI coach",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/EvaluateAnswerRequest" } } }
+        },
+        "responses": { "200": { "description": "Score and strengths/improvements feedback" } }
+      }
+    },
+    "/freelance-gigs": {
+      "get": {
+        "summary": "List open freelance gigs",
+        "responses": { "200": { "description": "Array of freelance gigs" } }
+      },
+      "post": {
+        "summary": "Post freelance project",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreateFreelanceGigRequest" } } }
+        },
+        "responses": { "201": { "description": "Gig created" } }
+      }
+    },
+    "/freelance-gigs/{id}": {
+      "get": {
+        "summary": "Get freelance gig by ID",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Single freelance gig details" } }
+      }
+    },
+    "/freelance-gigs/{id}/pitch": {
+      "post": {
+        "summary": "Generate tailored AI proposal pitch",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DraftPitchRequest" } } }
+        },
+        "responses": { "200": { "description": "Proposal draft generated" } }
+      }
+    },
+    "/freelance-gigs/{id}/status": {
+      "patch": {
+        "summary": "Update gig status",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdateGigStatusRequest" } } }
+        },
+        "responses": { "200": { "description": "Status updated" } }
+      }
+    }
+  }
+}

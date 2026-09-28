@@ -1,0 +1,61 @@
+{
+  "id": "jobwise-local-env",
+  "name": "JobWise Local Environment",
+  "values": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5001",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "secret",
+      "enabled": true
+    },
+    {
+      "key": "tokenExpiry",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "resumeId",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "jobId",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "applicationId",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "prepSessionId",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "gigId",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    }
+  ],
+  "_postman_variable_scope": "environment"
+}
