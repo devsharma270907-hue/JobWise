@@ -45,10 +45,20 @@ export class JobService {
     let userTargetRoles: string[] = [];
 
     if (userId) {
-      const user = await UserModel.findById(userId);
-      if (user) {
-        userSkills = user.skills || [];
-        userTargetRoles = user.targetRoles || [];
+      const [user, latestResume] = await Promise.all([
+        UserModel.findById(userId),
+        ResumeModel.findOne({ userId, isDeleted: false }).sort({ createdAt: -1 }),
+      ]);
+      const skillSet = new Set<string>();
+      if (user?.skills) {
+        user.skills.forEach((s) => skillSet.add(s));
+      }
+      if (latestResume?.parsedData?.skills) {
+        latestResume.parsedData.skills.forEach((s) => skillSet.add(s));
+      }
+      userSkills = Array.from(skillSet);
+      if (user?.targetRoles) {
+        userTargetRoles = user.targetRoles;
       }
     }
 

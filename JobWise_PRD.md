@@ -61,29 +61,51 @@ Detects formatting/ATS-parseability issues.
 Aggregates postings from connected job-board APIs / partner feeds and user-added URLs.
 Ranks postings by fit score computed from resume + stated preferences (role, location, comp, remote).
 Explains why a job matched ("matches your React + Node experience; missing: GraphQL").
-4.3 Skill Gap Analysis
+4.3 Skill Gap Analysis & Interactive Learning Roadmap
 Compares user's current skill profile against aggregate requirements of their target roles.
 Produces a prioritized gap list with suggested learning resources/projects to close each gap.
-4.4 Application Tailoring
-Generates a tailored resume bullet set and cover letter draft per job description.
+Interactive "Mark as Acquired" milestone checklist that dynamically recalculates fit scores in real time.
+4.4 Application Tailoring & Split-Screen Studio
+Interactive Split-Screen Studio: Target job description on the left with live ATS keyword highlighting (green = matched, amber = missing); editable resume & cover letter on the right.
+Visual AI Diff Engine: Displays original bullet vs tailored bullet side-by-side (+ added metric, - removed passive phrasing) with 1-click "Accept/Reject" per bullet.
 User reviews and edits before anything is exported/submitted — no silent auto-submission.
+1-Click Export Engine: Clean ATS-friendly PDF download, formatted Word export, and plain-text copy for ATS web forms.
 Version history per application (which resume/cover-letter variant was used where).
-4.5 Interview Preparation
+4.5 Interview Preparation & AI Voice Studio
 Generates likely interview questions from the job description + company context.
-Mock interview mode with AI feedback on answers (text or voice transcript).
+Interactive Voice & Timed Mock Interview Studio: Browser Web Speech API for voice-to-text answering with real-time waveform visualizer, plus 2-minute countdown timer per question.
 Behavioral (STAR-method) and technical prep tracks.
-4.6 Application Tracking
-Kanban-style pipeline: Saved → Applied → Interviewing → Offer → Rejected → Withdrawn.
-Reminders/follow-up nudges (e.g., "no response in 10 business days").
-Central timeline per application: documents used, notes, interview dates, contacts.
+Multi-Dimensional Scoring Radar: Detailed breakdown of Clarity, Relevance, STAR adherence, and Technical Depth after each response.
+4.6 Application CRM & Pipeline Tracker
+Kanban-style pipeline: Saved → Applied → Interviewing → Offer → Rejected → Withdrawn (drag-and-drop powered by @dnd-kit/core).
+Application CRM Slide-over Drawer: Deep-dive view with Company Intel, Recruiter/Interviewer Contact cards (name, LinkedIn, email), Interview timeline stages with calendar reminders, and internal notes.
 4.7 Freelancer Mode (parallel track)
 Gig matching against freelance marketplaces/feeds.
 Proposal/pitch drafting tailored to gig briefs.
 Lightweight pipeline for proposals sent → in discussion → won → completed.
+4.8 Job Search Funnel & Velocity Analytics
+Stage Conversion Funnel: Visualizes flow from Saved → Applied → Interviewing → Offer with stage drop-off percentages.
+Weekly Application Velocity Meter: User-configurable weekly goal (e.g., "Goal: 10 applications — 7 completed") with active streak tracker.
+4.9 Global Command Palette (Cmd+K / Ctrl+K)
+Instant keyboard-driven navigation, fuzzy search across all jobs and applications, quick action execution (switch theme, paste job URL, launch mock interview).
+4.10 Unique Market Differentiators (Competitive Edge)
+4.10.1 "Reverse Recruiter AI" & Company Strategic Angle Engine: Deep-analyzes company news, engineering blogs, and business priorities to formulate a unique "Strategic Angle" explaining how the candidate directly solves the hiring team's current pain points.
+4.10.2 Warm Referral & Outreach Intelligence: Automatically generates tailored 300-character LinkedIn connection requests, alumni outreach notes, and hiring manager cold emails customized to the target role.
+4.10.3 "Ghosting Detector" & Automated Follow-Up Strategist: Intelligent timeline monitoring that detects stalled applications based on industry response benchmarks (e.g. 7 business days for tech) and drafts polite, value-additive follow-up emails referencing recent company developments.
+4.10.4 Offer Comparison & Salary Negotiation Matrix: Comprehensive offer analyzer comparing Base, Bonus, Equity/Options, Benefits, and Cost-of-Living adjustments. Generates personalized counter-offer negotiation scripts based on skill rarity and market compensation benchmarks.
+4.10.5 Persistent Career Co-pilot Dock: A collapsible, contextual AI assistant present across all pages that retains memory of the currently active job, resume draft, or interview question for immediate on-demand guidance.
+4.11 Theme Engine & Deep Visual Customization
+Tri-mode display support: Light, Dark, and System Default with zero-FOUC (Flash of Unstyled Content).
+Curated Designer Palettes: Electric Violet (default), Oceanic Cyan, Emerald Mint, Sunset Amber, Rose Neon, and Monochrome Titanium.
+Custom Hex Color Picker: Full custom accent color selection with automated contrast, hover, and glow calculation via CSS custom properties.
+Seamless state persistence via localStorage and optional synchronization to user profile preferences.
+
 5. Key User Flows
-Onboarding: Sign up → upload resume → AI parses & scores it → user sets target roles/locations/comp → initial job matches shown.
-Daily/weekly loop: User opens dashboard → sees new ranked matches + skill-gap nudges → saves jobs → requests tailored application for a saved job → reviews/edits → marks as applied (tracker updates).
-Interview loop: User marks an application "Interviewing" → JobWise generates a prep pack for that specific job → user runs mock interview → gets feedback → logs real interview outcome.
+Onboarding: Sign up → choose theme/accent → upload resume → AI parses & scores it → user sets target roles/locations/comp → initial job matches shown.
+Daily/weekly loop: User opens dashboard → sees new ranked matches, funnel velocity, and follow-up alerts → saves jobs → launches Split-Screen Studio for tailored application → reviews/edits with visual diffs → marks as applied (tracker updates).
+Outreach loop: User clicks "Generate Warm Outreach" on saved job → JobWise provides 300-char LinkedIn note and hiring manager email → user copies and connects.
+Interview loop: User marks an application "Interviewing" → JobWise generates role-specific prep pack → user runs voice/timed mock interview → gets STAR radar scoring → logs real interview outcome.
+Offer loop: User marks application "Offer" → JobWise opens Offer Comparison Matrix → analyzes compensation package vs benchmarks → generates custom negotiation script.
 Freelancer loop: User switches to Freelancer Mode → sees ranked gigs → requests tailored pitch → tracks proposal status.
 6. Tech Stack
 
@@ -347,14 +369,31 @@ All items from the base blueprint's Section 6 apply unchanged (env/config, auth,
 
 Axios client, refresh-token interceptor, in-memory tokenStore, AuthProvider, RequireAuth, and TanStack Query hook patterns are identical to the base blueprint (Section 7) — reuse verbatim.
 
-JobWise-specific frontend additions:
+13.1 Theme Engine & Styling Architecture
+- CSS Variable Design System:
+  - Base Surface Tokens: `--bg-app`, `--bg-surface`, `--bg-surface-hover`, `--border-subtle`, `--text-main`, `--text-muted`, `--card-shadow`.
+  - Dynamic Accent Tokens: `--primary`, `--primary-hover`, `--primary-light`, `--primary-glow`, `--primary-fg`.
+- Theme Modes: Light, Dark, and System Default.
+- Curated Presets: Electric Violet (#6366f1), Oceanic Cyan (#06b6d4), Emerald Mint (#10b981), Sunset Amber (#f59e0b), Rose Neon (#f43f5e), Monochrome Titanium (#71717a).
+- Custom Hex Color Picker: HTML5 color input supporting custom accent colors with auto-calculated contrast text and dynamic glow.
+- Zero-FOUC (Flash of Unstyled Content): Inline head script restores saved theme and accent variables from localStorage before the React application hydrates.
+- Settings Control: User settings page exposes an interactive theme manager with live preview, preset chips, and a custom color picker.
 
-Resume upload flow: drag-and-drop → progress indicator → parsed-preview screen where the user confirms/corrects extracted fields before it's used for matching.
-Match feed: infinite-scroll or paginated list of ranked jobs with the "why this matched" explanation surfaced inline (not hidden behind a click).
-Skill gap view: prioritized list with a simple visual (e.g., bar per skill: have vs. need) and linked resources.
-Application tracker board: Kanban columns (Saved → Applied → Interviewing → Offer → Rejected/Withdrawn) using @dnd-kit/core; drag between columns updates status via a TanStack mutation.
-Interview prep/mock interview: chat-style UI, one question at a time, feedback rendered after each answer (not batched at the end).
-AI content review pattern: any AI-generated text (tailored bullets, cover letters, interview questions) is rendered as editable text areas, never auto-submitted anywhere — the user always has an explicit "Approve/Export" action.
+13.2 Core Feature Modules & UI Components
+- Resume Upload & Parse Flow: Drag-and-drop zone with progress indicator, ATS parse quality score badge, and an editable structured review drawer.
+- Job Match Feed: Infinite scroll / paginated cards with match percentage, inline match rationale ("Why this fits you"), dealbreaker filters, and 1-click save/tailor actions.
+- Interactive Split-Screen Tailoring Studio: Side-by-side workspace with job description & live keyword highlighting on the left, and editable resume bullets with visual diffs (+/-) and 1-click Accept/Reject on the right. 1-click ATS-ready PDF/Word export.
+- Voice & Timed Mock Interview Studio: Web Speech API voice-to-text recording, audio wave visualizer, 2-minute countdown timer, and multi-dimensional STAR scoring radar chart (Clarity, Relevance, STAR adherence, Technical depth).
+- Application CRM & Kanban Board: Drag-and-drop pipeline (@dnd-kit/core) with optimistic updates, plus a slide-over Application Detail Drawer containing company intel, recruiter contacts, timeline logs, and notes.
+- Job Search Funnel & Velocity Dashboard: Conversion funnel analytics, weekly target velocity gauge, and active application streak indicators.
+- Global Command Palette (Cmd+K / Ctrl+K): Fast search and action launcher across all jobs, applications, and settings.
+- Persistent AI Career Co-pilot Dock: Collapsible contextual AI assistant panel available on every screen for quick advice and interview questions.
+
+13.3 State Management & Performance
+- Server state: TanStack Query with optimistic mutations on Kanban moves and status transitions.
+- Client state: React Context for Theme/Appearance, Auth, and active Co-Pilot dock.
+- Rich text sanitization: DOMPurify applied to all AI-rendered content before rendering.
+
 14. Frontend Security Checklist
 
 All items from the base blueprint's Section 8 apply unchanged (token/session security, XSS prevention, CSRF, dependencies, data handling, route security). JobWise-specific additions:
@@ -363,6 +402,7 @@ All items from the base blueprint's Section 8 apply unchanged (token/session sec
  AI-generated cover letters/bullets sanitized before render if displayed as rich text
  File upload restricted client-side to .pdf/.docx, size-capped (e.g., 5MB), re-validated server-side
  No resume content or structured PII persisted to localStorage/sessionStorage
+
 15. Success Metrics (KPIs)
 Metric	Target (v1 pilot)
 Median time from "save job" to "tailored draft ready"	< 2 minutes
@@ -371,11 +411,34 @@ Median time from "save job" to "tailored draft ready"	< 2 minutes
 Weekly active users returning to tracker	> 40% of signups
 Mock interview sessions per active user / month	≥ 2
 AI budget overage rate (users hitting monthly cap)	< 5%
+
 16. Roadmap / Phasing
-Phase 1 (MVP): Resume upload/parse, job matching (single feed source), application tracker, basic tailoring (bullets only).
-Phase 2: Skill gap analysis, full cover-letter tailoring, interview prep (text-based).
-Phase 3: Mock interview with voice input/transcript, freelancer mode, multi-source job feed aggregation.
-Phase 4 (exploratory): Employer-facing surface (candidate discovery), browser extension for one-click "save this job," calendar integration for interview scheduling.
+Phase 1 (Core MVP): 
+- Comprehensive Theme Engine (Dark/Light/System + 6 presets + custom hex picker).
+- Resume upload, parse, and ATS score review.
+- Job discovery, matching feed, and fit rationale.
+- Kanban application tracker (@dnd-kit/core) with Application CRM detail drawer.
+- Split-Screen Tailoring Studio with visual AI diffs and 1-click exports.
+- Global Command Palette (`Cmd+K` / `Ctrl+K`).
+- Job search funnel analytics & weekly velocity tracker.
+
+Phase 2 (AI Intelligence & Outreach):
+- Reverse Recruiter AI & Company Strategic Angle generator.
+- Warm Referral & Outreach note builder (LinkedIn & hiring manager cold email).
+- Interactive Voice & Timed Mock Interview Studio with STAR rubric radar.
+- Skill Gap Analysis with interactive "Mark as Acquired" learning roadmap.
+- Ghosting Detector & automated follow-up strategist.
+
+Phase 3 (Monetization, Offers & Advanced Tools):
+- Offer Comparison & Salary Negotiation Matrix.
+- Freelancer Mode with gig marketplace matching & proposal builder.
+- Multi-source job feed aggregation and partner APIs.
+- Persistent Career Co-pilot Dock with conversational memory.
+
+Phase 4 (Ecosystem & Enterprise):
+- Chrome / Browser extension for 1-click job clipping from LinkedIn, Indeed, and Greenhouse.
+- Google / Outlook Calendar integration for interview scheduling.
+- Employer-facing surface for candidate discovery and verified credentials.
 17. Master Bootstrap Prompt
 
 Adapted from the base blueprint's Section 11.1 — copy into an AI coding assistant once this PRD is approved:

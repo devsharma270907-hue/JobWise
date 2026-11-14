@@ -3,6 +3,7 @@ import { createApp } from './app.js';
 import { env } from './config/env.js';
 import { connectDB, disconnectDB } from './config/db.js';
 import { jobFeedService } from './services/jobFeed.service.js';
+import { seedService } from './services/seed.service.js';
 import { startCronJobs } from './services/cron.service.js';
 import { logger } from './utils/logger.js';
 
@@ -13,7 +14,10 @@ async function bootstrap(): Promise<void> {
   // 2. Seed initial sample jobs for immediate usability
   await jobFeedService.seedIfEmpty();
 
-  // 3. Start background cron jobs
+  // 3. Seed demo account & sample pipeline for immediate login usability
+  await seedService.seedDemoUser();
+
+  // 4. Start background cron jobs
   startCronJobs();
 
   // 4. Initialize Express App

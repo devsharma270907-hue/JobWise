@@ -1,5 +1,13 @@
 import mongoose, { Document, Schema, Model } from 'mongoose';
 
+export interface IRecruiterInfo {
+  name: string;
+  title: string;
+  email?: string;
+  linkedInUrl?: string;
+  avatarUrl?: string;
+}
+
 export interface IJob extends Document {
   _id: mongoose.Types.ObjectId;
   title: string;
@@ -13,6 +21,7 @@ export interface IJob extends Document {
   requirements: string[];
   skills: string[];
   externalUrl?: string;
+  recruiter?: IRecruiterInfo;
   source: 'feed' | 'user' | 'partner';
   isDeleted: boolean;
   createdAt: Date;
@@ -40,6 +49,13 @@ const jobSchema = new Schema<IJob>(
     requirements: { type: [String], default: [] },
     skills: { type: [String], default: [], index: true },
     externalUrl: { type: String },
+    recruiter: {
+      name: { type: String },
+      title: { type: String },
+      email: { type: String },
+      linkedInUrl: { type: String },
+      avatarUrl: { type: String },
+    },
     source: { type: String, enum: ['feed', 'user', 'partner'], default: 'feed' },
     isDeleted: { type: Boolean, default: false, index: true },
   },

@@ -77,41 +77,67 @@ async function resolveSrvUri(uri: string): Promise<string> {
   }
 }
 
+let memoryServer: any = null;
+
 export async function connectDB(): Promise<void> {
-  try {
-    mongoose.connection.on('connected', () => {
-      logger.info('MongoDB connected successfully');
-    });
+  mongoose.connection.on('connected', () => {
+    logger.info('MongoDB connected successfully');
+  });
 
-    mongoose.connection.on('error', (err) => {
-      logger.error('MongoDB connection error:', { error: err.message });
-    });
+  mongoose.connection.on('error', (err) => {
+    logger.error('MongoDB connection error:', { error: err.message });
+  });
 
-    mongoose.connection.on('disconnected', () => {
-      logger.warn('MongoDB disconnected');
-    });
+  mongoose.connection.on('disconnected', () => {
+    logger.warn('MongoDB disconnected');
+  });
 
-    let uriToConnect = env.MONGODB_URI;
-    if (uriToConnect.startsWith('mongodb+srv://')) {
-      const resolved = await resolveSrvUri(uriToConnect);
-      if (resolved !== uriToConnect) {
-        logger.info('Successfully resolved MongoDB Atlas SRV URI via DNS-over-HTTPS');
-        uriToConnect = resolved;
-      }
+  let uriToConnect = env.MONGODB_URI;
+  if (uriToConnect.startsWith('mongodb+srv://')) {
+    const resolved = await resolveSrvUri(uriToConnect);
+    if (resolved !== uriToConnect) {
+      logger.info('Successfully resolved MongoDB Atlas SRV URI via DNS-over-HTTPS');
+      uriToConnect = resolved;
     }
+  }
 
-    await mongoose.connect(uriToConnect);
-  } catch (error) {
-    logger.error('Failed to connect to MongoDB on startup', {
-      error: error instanceof Error ? error.message : String(error),
+  try {
+    await mongoose.connect(uriToConnect, { serverSelectionTimeoutMS: 3000 });
+  } catch (initialErr) {
+    logger.warn('Primary MongoDB connection failed. Attempting local development fallback...', {
+      error: initialErr instanceof Error ? initialErr.message : String(initialErr),
     });
-    process.exit(1);
+
+    try {
+      const { MongoMemoryServer } = await import('mongodb-memory-server');
+      try {
+        memoryServer = await MongoMemoryServer.create({
+          instance: { port: 27017, dbName: 'JobWise' },
+        });
+      } catch {
+        memoryServer = await MongoMemoryServer.create({
+          instance: { dbName: 'JobWise' },
+        });
+      }
+      const memUri = memoryServer.getUri();
+      logger.info(`Started embedded local MongoDB instance at: ${memUri} [Database: JobWise]`);
+      await mongoose.connect(memUri.replace(/\/?$/, '/JobWise'));
+    } catch (memErr) {
+      logger.error('Failed to start both primary and fallback MongoDB instances', {
+        error: memErr instanceof Error ? memErr.message : String(memErr),
+      });
+      process.exit(1);
+    }
   }
 }
 
 export async function disconnectDB(): Promise<void> {
   try {
     await mongoose.disconnect();
+    if (memoryServer) {
+      await memoryServer.stop();
+      logger.info('Embedded MongoDB instance stopped cleanly');
+    }
     logger.info('MongoDB disconnected cleanly');
   } catch (error) {
     logger.error('Error during MongoDB disconnect', {
@@ -119,4 +145,5 @@ export async function disconnectDB(): Promise<void> {
     });
   }
 }
+
 

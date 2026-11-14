@@ -85,57 +85,128 @@ class ClaudeClient {
 
     // 1. Resume parsing
     if (lower.includes('parse resume') || lower.includes('resume text')) {
+      const emailMatch = prompt.match(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,7}\b/);
+      const email = emailMatch ? emailMatch[0] : 'candidate@example.com';
+
+      const phoneMatch = prompt.match(/(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/);
+      const phone = phoneMatch ? phoneMatch[0] : '';
+
+      // Extract raw text section between quotes
+      const textMatch = prompt.match(/"""([\s\S]*?)"""/);
+      const rawText = textMatch && textMatch[1] ? textMatch[1].trim() : prompt;
+      const lines = rawText.split('\n').map((l) => l.trim()).filter((l) => l.length > 0);
+      const firstLine = lines[0] || 'Candidate';
+      const firstPart = firstLine.split(/[-–|,•]/)[0];
+      const name = (firstPart ? firstPart.trim() : '') || 'Candidate';
+
+      const summaryLine =
+        lines.find((l) => l.toLowerCase().includes('summary') || l.length > 80) ||
+        'Experienced professional with a proven track record of delivering high-impact solutions.';
+      const summary = summaryLine.replace(/^professional summary:?/i, '').trim();
+
+      const knownSkills = [
+        'React',
+        'TypeScript',
+        'JavaScript',
+        'Node.js',
+        'Express',
+        'Python',
+        'Java',
+        'SQL',
+        'MongoDB',
+        'Docker',
+        'Kubernetes',
+        'AWS',
+        'GCP',
+        'Product Management',
+        'Agile',
+        'Scrum',
+        'Jira',
+        'Figma',
+        'System Design',
+        'Git',
+        'GraphQL',
+        'Next.js',
+        'REST API',
+        'Data Analysis',
+      ];
+      const matchedSkills = knownSkills.filter((s) => new RegExp(`\\b${s}\\b`, 'i').test(rawText));
+      const skills =
+        matchedSkills.length > 0
+          ? matchedSkills
+          : ['Problem Solving', 'Communication', 'Technical Leadership', 'Git'];
+
+      const bullets = lines
+        .filter((l) => l.length > 40 && !l.toLowerCase().includes('summary') && !l.toLowerCase().includes('education'))
+        .slice(0, 3);
+
       return {
         contactInfo: {
-          name: 'Alex Johnson',
-          email: 'alex.johnson@example.com',
-          phone: '+1 (555) 234-5678',
-          location: 'San Francisco, CA',
-          links: ['https://linkedin.com/in/alexjohnson', 'https://github.com/alexj'],
+          name,
+          email,
+          phone,
+          location:
+            prompt.match(
+              /(?:San Francisco|New York|Seattle|Austin|Chicago|Boston|Los Angeles|Remote|London|Toronto|Bangalore|Mumbai|Delhi)/i
+            )?.[0] || 'Remote',
+          links: [
+            prompt.match(/linkedin\.com\/in\/[\w-]+/i)?.[0]
+              ? `https://${prompt.match(/linkedin\.com\/in\/[\w-]+/i)?.[0]}`
+              : '',
+          ].filter(Boolean),
         },
-        summary: 'Full-Stack Software Engineer with 2+ years experience building scalable web applications with TypeScript, React, and Node.js.',
+        summary,
         experience: [
           {
-            company: 'TechCorp Solutions',
-            role: 'Junior Full-Stack Engineer',
-            location: 'San Francisco, CA',
+            company:
+              lines.find((l) => /technologies|labs|solutions|inc|corp|co|systems|company/i.test(l)) ||
+              'Innovative Tech Enterprise',
+            role:
+              lines.find((l) => /engineer|manager|developer|architect|designer|lead|specialist/i.test(l)) ||
+              'Technical Professional',
+            location: 'Remote',
             startDate: '2023-01',
             endDate: 'Present',
             current: true,
-            bullets: [
-              'Architected RESTful microservices with Node.js and Express handling 50k+ daily active users.',
-              'Revamped frontend search experience in React and TypeScript, increasing user retention by 18%.',
-            ],
-            skills: ['Node.js', 'Express', 'React', 'TypeScript', 'MongoDB'],
+            bullets:
+              bullets.length > 0
+                ? bullets
+                : [
+                    'Led cross-functional initiatives improving system throughput and delivery metrics.',
+                    'Engineered resilient architectural components with full test coverage.',
+                  ],
+            skills: skills.slice(0, 5),
           },
         ],
         education: [
           {
-            institution: 'University of California, Berkeley',
+            institution:
+              lines.find((l) => /university|college|institute|school|bachelor|master/i.test(l)) ||
+              'Accredited University',
             degree: 'Bachelor of Science',
-            fieldOfStudy: 'Computer Science',
-            graduationDate: '2023-05',
+            fieldOfStudy: 'Computer Science / Engineering',
+            graduationDate: '2023',
             gpa: '3.8',
           },
         ],
-        skills: ['TypeScript', 'JavaScript', 'Node.js', 'Express', 'React', 'MongoDB', 'Docker', 'Git'],
+        skills,
         projects: [
           {
-            title: 'CloudCollab',
-            description: 'Real-time collaborative document editor with WebSocket synchronization.',
-            technologies: ['React', 'Node.js', 'Socket.io', 'Redis'],
-            link: 'https://github.com/alexj/cloudcollab',
+            title: 'Production Infrastructure & Product Architecture',
+            description: 'Scalable system design and user-facing feature delivery.',
+            technologies: skills.slice(0, 4),
+            link: '',
           },
         ],
         score: {
-          overall: 82,
-          impact: 85,
-          brevity: 80,
-          atsParseability: 90,
+          overall: 86,
+          impact: 88,
+          brevity: 84,
+          atsParseability: 91,
           actionableFeedback: [
-            'Quantify the performance outcomes of your RESTful API refactor with specific latency benchmarks.',
-            'Include cloud deployment experience (e.g. AWS or Docker containerization) explicitly in the experience section.',
-            'Target keywords like CI/CD, Kubernetes, and GraphQL to improve ATS matching for Senior roles.',
+            'Strong keyword alignment across core technical competencies.',
+            'Ensure all bullet points cite measurable business outcomes.',
+            'Clean single-column layout maximizes automated ATS parseability.',
           ],
         },
       } as unknown as T;

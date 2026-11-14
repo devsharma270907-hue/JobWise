@@ -115,7 +115,21 @@ export class AuthService {
       expiresAt,
     });
 
-    await user.save();
+    try {
+      await user.save();
+    } catch (saveErr: any) {
+      if (saveErr?.name === 'VersionError') {
+        await UserModel.findByIdAndUpdate(user._id, {
+          $set: {
+            failedLoginAttempts: 0,
+            lockUntil: null,
+            refreshTokens: user.refreshTokens,
+          },
+        });
+      } else {
+        throw saveErr;
+      }
+    }
 
     return { user, accessToken, refreshToken };
   }
@@ -182,7 +196,17 @@ export class AuthService {
       expiresAt,
     });
 
-    await user.save();
+    try {
+      await user.save();
+    } catch (saveErr: any) {
+      if (saveErr?.name === 'VersionError') {
+        await UserModel.findByIdAndUpdate(user._id, {
+          $set: { refreshTokens: user.refreshTokens },
+        });
+      } else {
+        throw saveErr;
+      }
+    }
 
     return { accessToken, newRefreshToken };
   }

@@ -567,6 +567,7 @@ erDiagram
         string[] requirements
         string[] skills
         string externalUrl
+        object recruiter
         date createdAt
     }
 ```
