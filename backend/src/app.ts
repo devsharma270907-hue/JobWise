@@ -1,4 +1,4 @@
-import express, { Express, Request, Response } from 'express';
+import express, { Express, Request, Response, NextFunction } from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
@@ -6,6 +6,8 @@ import mongoSanitize from 'express-mongo-sanitize';
 import rateLimit from 'express-rate-limit';
 import morgan from 'morgan';
 import mongoose from 'mongoose';
+import path from 'path';
+import fs from 'fs';
 
 import { env } from './config/env.js';
 import { errorHandler } from './middleware/errorHandler.js';
@@ -43,7 +45,7 @@ export function createApp(): Express {
   const app = express();
 
   // 1. Security Headers
-  app.use(helmet());
+  app.use(helmet({ contentSecurityPolicy: false }));
 
   // 2. CORS - Explicit origin allowlist only, never wildcard with credentials
   const allowedOrigins = env.CORS_ORIGINS.split(',').map((o) => o.trim());
@@ -129,7 +131,26 @@ export function createApp(): Express {
 
   app.use('/api/v1', apiRouter);
 
-  // 10. 404 Route Handler
+  // 10. Serve Frontend Static Assets if available (Single-Service Full Stack Deploy)
+  const candidateDistPaths = [
+    path.resolve(process.cwd(), '../frontend/dist'),
+    path.resolve(process.cwd(), 'frontend/dist'),
+    path.resolve(__dirname, '../../../frontend/dist'),
+    path.resolve(__dirname, '../../frontend/dist'),
+  ];
+  const targetDist = candidateDistPaths.find((p) => fs.existsSync(p));
+
+  if (targetDist) {
+    app.use(express.static(targetDist));
+    app.get('*', (req: Request, res: Response, next: NextFunction) => {
+      if (req.path.startsWith('/api') || req.path === '/health' || req.path === '/ready') {
+        return next();
+      }
+      res.sendFile(path.join(targetDist, 'index.html'));
+    });
+  }
+
+  // 11. 404 Route Handler
   app.use((_req: Request, res: Response) => {
     res.status(404).json({
       success: false,
