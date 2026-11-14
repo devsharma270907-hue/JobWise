@@ -4,7 +4,7 @@
   "private": true,
   "description": "JobWise - Autonomous AI Career Agent",
   "scripts": {
-    "install:backend": "npm install --prefix backend",
+    "install:backend": "npm install --prefix backend --include=dev",
     "install:frontend": "npm install --prefix frontend",
     "build:backend": "npm run build --prefix backend",
     "build:frontend": "npm run build --prefix frontend",
