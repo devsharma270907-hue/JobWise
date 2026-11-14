@@ -22,7 +22,10 @@ const envSchema = z.object({
   CORS_ORIGINS: z.string().default('http://localhost:5173,http://localhost:3000'),
 
   // Encryption Key (AES-256-GCM requires 32 bytes -> 64 hex characters)
-  ENCRYPTION_KEY: z.string().length(64, 'ENCRYPTION_KEY must be exactly 64 hex characters (32 bytes)'),
+  ENCRYPTION_KEY: z
+    .string()
+    .length(64, 'ENCRYPTION_KEY must be exactly 64 hex characters (32 bytes)')
+    .default('c805980b94597caf987f0a6b7208aa94275a462cf7e215678ecb3c3de17c0948'),
 
   // AI Integration (Claude)
   ANTHROPIC_API_KEY: z.string().default('mock_dev_key'),

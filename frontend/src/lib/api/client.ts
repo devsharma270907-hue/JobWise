@@ -2,8 +2,10 @@ import axios, { type InternalAxiosRequestConfig } from 'axios';
 import { tokenStore } from '../../auth/tokenStore';
 import { refreshClient } from './refreshClient';
 
+const apiBase = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
+
 export const client = axios.create({
-  baseURL: '/api/v1',
+  baseURL: `${apiBase}/api/v1`,
   withCredentials: true,
   timeout: 15000,
 });

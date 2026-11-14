@@ -11,7 +11,7 @@ function setRefreshCookie(res: Response, token: string): void {
   res.cookie(COOKIE_NAME, token, {
     httpOnly: true,
     secure: env.NODE_ENV === 'production',
-    sameSite: env.NODE_ENV === 'production' ? 'strict' : 'lax',
+    sameSite: env.NODE_ENV === 'production' ? 'none' : 'lax',
     maxAge: SEVEN_DAYS_MS,
     path: '/api/v1/auth',
   });
@@ -21,7 +21,7 @@ function clearRefreshCookie(res: Response): void {
   res.clearCookie(COOKIE_NAME, {
     httpOnly: true,
     secure: env.NODE_ENV === 'production',
-    sameSite: env.NODE_ENV === 'production' ? 'strict' : 'lax',
+    sameSite: env.NODE_ENV === 'production' ? 'none' : 'lax',
     path: '/api/v1/auth',
   });
 }
