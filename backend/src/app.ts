@@ -142,8 +142,8 @@ export function createApp(): Express {
 
   if (targetDist) {
     app.use(express.static(targetDist));
-    app.get('*', (req: Request, res: Response, next: NextFunction) => {
-      if (req.path.startsWith('/api') || req.path === '/health' || req.path === '/ready') {
+    app.use((req: Request, res: Response, next: NextFunction) => {
+      if (req.method !== 'GET' || req.path.startsWith('/api') || req.path === '/health' || req.path === '/ready') {
         return next();
       }
       res.sendFile(path.join(targetDist, 'index.html'));
